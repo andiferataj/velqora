@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:velqora:security-event:1",
+  "title": "Velqora Security Event v1",
+  "type": "object",
+  "required": [
+    "id",
+    "schemaVersion",
+    "occurredAt",
+    "source",
+    "type",
+    "device",
+    "account",
+    "ipAddress"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "type": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "device": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "account": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "ipAddress": {
+      "type": "string",
+      "anyOf": [
+        {
+          "format": "ipv4"
+        },
+        {
+          "format": "ipv6"
+        }
+      ]
+    },
+    "attributes": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "maxProperties": 24,
+      "propertyNames": {
+        "minLength": 1,
+        "maxLength": 64
+      },
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 512
+      }
+    },
+    "synthetic": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "additionalProperties": false
+}

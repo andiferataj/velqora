@@ -1,0 +1,382 @@
+CREATE TABLE "AspNetRoles" (
+    "Id" character varying(4000) NOT NULL,
+    "Name" character varying(256),
+    "NormalizedName" character varying(256),
+    "ConcurrencyStamp" character varying(4000),
+    CONSTRAINT "PK_AspNetRoles" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "AspNetUsers" (
+    "Id" character varying(4000) NOT NULL,
+    "UserName" character varying(256),
+    "NormalizedUserName" character varying(256),
+    "Email" character varying(256),
+    "NormalizedEmail" character varying(256),
+    "EmailConfirmed" boolean NOT NULL,
+    "PasswordHash" character varying(4000),
+    "SecurityStamp" character varying(4000),
+    "ConcurrencyStamp" character varying(4000),
+    "PhoneNumber" character varying(4000),
+    "PhoneNumberConfirmed" boolean NOT NULL,
+    "TwoFactorEnabled" boolean NOT NULL,
+    "LockoutEnd" timestamp with time zone,
+    "LockoutEnabled" boolean NOT NULL,
+    "AccessFailedCount" integer NOT NULL,
+    CONSTRAINT "PK_AspNetUsers" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "Assets" (
+    "Id" uuid NOT NULL,
+    "Name" character varying(4000) NOT NULL,
+    "Kind" character varying(4000) NOT NULL,
+    "Owner" character varying(4000) NOT NULL,
+    "IpAddress" character varying(4000) NOT NULL,
+    "Account" character varying(4000) NOT NULL,
+    "LastSeenAt" timestamp with time zone,
+    "Synthetic" boolean NOT NULL,
+    "Isolated" boolean NOT NULL,
+    "AccountLocked" boolean NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    "Version" integer NOT NULL,
+    CONSTRAINT "PK_Assets" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "AuditEvents" (
+    "Id" uuid NOT NULL,
+    "ActorId" character varying(4000) NOT NULL,
+    "Action" character varying(4000) NOT NULL,
+    "Resource" character varying(4000) NOT NULL,
+    "Detail" character varying(4000) NOT NULL,
+    "TraceId" character varying(4000) NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    CONSTRAINT "PK_AuditEvents" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "DetectionRules" (
+    "Id" uuid NOT NULL,
+    "Name" character varying(4000) NOT NULL,
+    "Description" character varying(4000) NOT NULL,
+    "Kind" integer NOT NULL,
+    "EventType" character varying(4000) NOT NULL,
+    "Threshold" integer NOT NULL,
+    "WindowSeconds" integer NOT NULL,
+    "Severity" integer NOT NULL,
+    "Enabled" boolean NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    "Version" integer NOT NULL,
+    CONSTRAINT "PK_DetectionRules" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "Incidents" (
+    "Id" uuid NOT NULL,
+    "Title" character varying(4000) NOT NULL,
+    "Summary" character varying(4000) NOT NULL,
+    "Severity" integer NOT NULL,
+    "Status" integer NOT NULL,
+    "OwnerId" character varying(4000),
+    "ResolvedAt" timestamp with time zone,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    "Version" integer NOT NULL,
+    CONSTRAINT "PK_Incidents" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "Playbooks" (
+    "Id" uuid NOT NULL,
+    "Trigger" character varying(4000) NOT NULL,
+    "MinimumSeverity" integer NOT NULL,
+    "Name" character varying(4000) NOT NULL,
+    "Action" character varying(4000) NOT NULL,
+    "Description" character varying(4000) NOT NULL,
+    "Enabled" boolean NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    "Version" integer NOT NULL,
+    CONSTRAINT "PK_Playbooks" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "ScenarioRuns" (
+    "Id" uuid NOT NULL,
+    "Scenario" character varying(4000) NOT NULL,
+    "RequestedBy" character varying(4000) NOT NULL,
+    "Status" integer NOT NULL,
+    "Cursor" integer NOT NULL,
+    "TotalEvents" integer NOT NULL,
+    "FinishedAt" timestamp with time zone,
+    "Device" character varying(4000) NOT NULL,
+    "Account" character varying(4000) NOT NULL,
+    "Error" character varying(4000),
+    "CreatedAt" timestamp with time zone NOT NULL,
+    "Version" integer NOT NULL,
+    CONSTRAINT "PK_ScenarioRuns" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "SecurityEvents" (
+    "Id" uuid NOT NULL,
+    "SchemaVersion" integer NOT NULL,
+    "OccurredAt" timestamp with time zone NOT NULL,
+    "Source" character varying(4000) NOT NULL,
+    "Type" character varying(4000) NOT NULL,
+    "Device" character varying(4000) NOT NULL,
+    "Account" character varying(4000) NOT NULL,
+    "IpAddress" character varying(4000) NOT NULL,
+    "AttributesJson" jsonb NOT NULL,
+    "Synthetic" boolean NOT NULL,
+    "ScenarioRunId" uuid,
+    "PayloadHash" character varying(4000) NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    CONSTRAINT "PK_SecurityEvents" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "ServiceHeartbeats" (
+    "Id" uuid NOT NULL,
+    "Service" character varying(4000) NOT NULL,
+    "LastSeenAt" timestamp with time zone NOT NULL,
+    "State" character varying(4000) NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    CONSTRAINT "PK_ServiceHeartbeats" PRIMARY KEY ("Id")
+);
+
+
+CREATE TABLE "AspNetRoleClaims" (
+    "Id" integer GENERATED BY DEFAULT AS IDENTITY,
+    "RoleId" character varying(4000) NOT NULL,
+    "ClaimType" character varying(4000),
+    "ClaimValue" character varying(4000),
+    CONSTRAINT "PK_AspNetRoleClaims" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_AspNetRoleClaims_AspNetRoles_RoleId" FOREIGN KEY ("RoleId") REFERENCES "AspNetRoles" ("Id") ON DELETE CASCADE
+);
+
+
+CREATE TABLE "AspNetUserClaims" (
+    "Id" integer GENERATED BY DEFAULT AS IDENTITY,
+    "UserId" character varying(4000) NOT NULL,
+    "ClaimType" character varying(4000),
+    "ClaimValue" character varying(4000),
+    CONSTRAINT "PK_AspNetUserClaims" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_AspNetUserClaims_AspNetUsers_UserId" FOREIGN KEY ("UserId") REFERENCES "AspNetUsers" ("Id") ON DELETE CASCADE
+);
+
+
+CREATE TABLE "AspNetUserLogins" (
+    "LoginProvider" character varying(4000) NOT NULL,
+    "ProviderKey" character varying(4000) NOT NULL,
+    "ProviderDisplayName" character varying(4000),
+    "UserId" character varying(4000) NOT NULL,
+    CONSTRAINT "PK_AspNetUserLogins" PRIMARY KEY ("LoginProvider", "ProviderKey"),
+    CONSTRAINT "FK_AspNetUserLogins_AspNetUsers_UserId" FOREIGN KEY ("UserId") REFERENCES "AspNetUsers" ("Id") ON DELETE CASCADE
+);
+
+
+CREATE TABLE "AspNetUserRoles" (
+    "UserId" character varying(4000) NOT NULL,
+    "RoleId" character varying(4000) NOT NULL,
+    CONSTRAINT "PK_AspNetUserRoles" PRIMARY KEY ("UserId", "RoleId"),
+    CONSTRAINT "FK_AspNetUserRoles_AspNetRoles_RoleId" FOREIGN KEY ("RoleId") REFERENCES "AspNetRoles" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_AspNetUserRoles_AspNetUsers_UserId" FOREIGN KEY ("UserId") REFERENCES "AspNetUsers" ("Id") ON DELETE CASCADE
+);
+
+
+CREATE TABLE "AspNetUserTokens" (
+    "UserId" character varying(4000) NOT NULL,
+    "LoginProvider" character varying(4000) NOT NULL,
+    "Name" character varying(4000) NOT NULL,
+    "Value" character varying(4000),
+    CONSTRAINT "PK_AspNetUserTokens" PRIMARY KEY ("UserId", "LoginProvider", "Name"),
+    CONSTRAINT "FK_AspNetUserTokens_AspNetUsers_UserId" FOREIGN KEY ("UserId") REFERENCES "AspNetUsers" ("Id") ON DELETE CASCADE
+);
+
+
+CREATE TABLE "Alerts" (
+    "Id" uuid NOT NULL,
+    "RuleId" uuid NOT NULL,
+    "RuleVersion" integer NOT NULL,
+    "Title" character varying(4000) NOT NULL,
+    "Device" character varying(4000) NOT NULL,
+    "Account" character varying(4000) NOT NULL,
+    "Severity" integer NOT NULL,
+    "Status" integer NOT NULL,
+    "OwnerId" character varying(4000),
+    "DeduplicationKey" character varying(4000) NOT NULL,
+    "ScenarioRunId" uuid,
+    "Synthetic" boolean NOT NULL,
+    "DetectedAt" timestamp with time zone NOT NULL,
+    "WindowStart" timestamp with time zone NOT NULL,
+    "WindowEnd" timestamp with time zone NOT NULL,
+    "Feedback" character varying(4000),
+    "CreatedAt" timestamp with time zone NOT NULL,
+    "Version" integer NOT NULL,
+    CONSTRAINT "PK_Alerts" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_Alerts_DetectionRules_RuleId" FOREIGN KEY ("RuleId") REFERENCES "DetectionRules" ("Id") ON DELETE RESTRICT
+);
+
+
+CREATE TABLE "IncidentTimeline" (
+    "Id" uuid NOT NULL,
+    "IncidentId" uuid NOT NULL,
+    "ActorId" character varying(4000) NOT NULL,
+    "Kind" character varying(4000) NOT NULL,
+    "Text" character varying(4000) NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    CONSTRAINT "PK_IncidentTimeline" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_IncidentTimeline_Incidents_IncidentId" FOREIGN KEY ("IncidentId") REFERENCES "Incidents" ("Id") ON DELETE RESTRICT
+);
+
+
+CREATE TABLE "PlaybookRuns" (
+    "Id" uuid NOT NULL,
+    "ActionSnapshot" character varying(4000) NOT NULL,
+    "PlaybookVersion" integer NOT NULL,
+    "PlaybookId" uuid NOT NULL,
+    "IncidentId" uuid NOT NULL,
+    "AssetId" uuid NOT NULL,
+    "RequestedBy" character varying(4000) NOT NULL,
+    "ApprovedBy" character varying(4000),
+    "Status" integer NOT NULL,
+    "Result" character varying(4000),
+    "Attempts" integer NOT NULL,
+    "ExecutedAt" timestamp with time zone,
+    "NextAttemptAt" timestamp with time zone NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    "Version" integer NOT NULL,
+    CONSTRAINT "PK_PlaybookRuns" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_PlaybookRuns_Assets_AssetId" FOREIGN KEY ("AssetId") REFERENCES "Assets" ("Id") ON DELETE RESTRICT,
+    CONSTRAINT "FK_PlaybookRuns_Incidents_IncidentId" FOREIGN KEY ("IncidentId") REFERENCES "Incidents" ("Id") ON DELETE RESTRICT,
+    CONSTRAINT "FK_PlaybookRuns_Playbooks_PlaybookId" FOREIGN KEY ("PlaybookId") REFERENCES "Playbooks" ("Id") ON DELETE RESTRICT
+);
+
+
+CREATE TABLE "OutboxMessages" (
+    "Id" uuid NOT NULL,
+    "EventId" uuid NOT NULL,
+    "TraceParent" character varying(4000),
+    "PublishedAt" timestamp with time zone,
+    "Attempts" integer NOT NULL,
+    "LastError" character varying(4000),
+    "NextAttemptAt" timestamp with time zone NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    CONSTRAINT "PK_OutboxMessages" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_OutboxMessages_SecurityEvents_EventId" FOREIGN KEY ("EventId") REFERENCES "SecurityEvents" ("Id") ON DELETE RESTRICT
+);
+
+
+CREATE TABLE "ProcessedMessages" (
+    "Id" uuid NOT NULL,
+    "EventId" uuid NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    CONSTRAINT "PK_ProcessedMessages" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_ProcessedMessages_SecurityEvents_EventId" FOREIGN KEY ("EventId") REFERENCES "SecurityEvents" ("Id") ON DELETE RESTRICT
+);
+
+
+CREATE TABLE "AlertEvidence" (
+    "Id" uuid NOT NULL,
+    "AlertId" uuid NOT NULL,
+    "EventId" uuid NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    CONSTRAINT "PK_AlertEvidence" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_AlertEvidence_Alerts_AlertId" FOREIGN KEY ("AlertId") REFERENCES "Alerts" ("Id") ON DELETE RESTRICT,
+    CONSTRAINT "FK_AlertEvidence_SecurityEvents_EventId" FOREIGN KEY ("EventId") REFERENCES "SecurityEvents" ("Id") ON DELETE RESTRICT
+);
+
+
+CREATE TABLE "IncidentAlerts" (
+    "Id" uuid NOT NULL,
+    "IncidentId" uuid NOT NULL,
+    "AlertId" uuid NOT NULL,
+    "CreatedAt" timestamp with time zone NOT NULL,
+    CONSTRAINT "PK_IncidentAlerts" PRIMARY KEY ("Id"),
+    CONSTRAINT "FK_IncidentAlerts_Alerts_AlertId" FOREIGN KEY ("AlertId") REFERENCES "Alerts" ("Id") ON DELETE RESTRICT,
+    CONSTRAINT "FK_IncidentAlerts_Incidents_IncidentId" FOREIGN KEY ("IncidentId") REFERENCES "Incidents" ("Id") ON DELETE RESTRICT
+);
+
+
+CREATE UNIQUE INDEX "IX_AlertEvidence_AlertId_EventId" ON "AlertEvidence" ("AlertId", "EventId");
+
+
+CREATE INDEX "IX_AlertEvidence_EventId" ON "AlertEvidence" ("EventId");
+
+
+CREATE UNIQUE INDEX "IX_Alerts_DeduplicationKey" ON "Alerts" ("DeduplicationKey");
+
+
+CREATE INDEX "IX_Alerts_DetectedAt" ON "Alerts" ("DetectedAt");
+
+
+CREATE INDEX "IX_Alerts_RuleId" ON "Alerts" ("RuleId");
+
+
+CREATE INDEX "IX_AspNetRoleClaims_RoleId" ON "AspNetRoleClaims" ("RoleId");
+
+
+CREATE UNIQUE INDEX "RoleNameIndex" ON "AspNetRoles" ("NormalizedName");
+
+
+CREATE INDEX "IX_AspNetUserClaims_UserId" ON "AspNetUserClaims" ("UserId");
+
+
+CREATE INDEX "IX_AspNetUserLogins_UserId" ON "AspNetUserLogins" ("UserId");
+
+
+CREATE INDEX "IX_AspNetUserRoles_RoleId" ON "AspNetUserRoles" ("RoleId");
+
+
+CREATE INDEX "EmailIndex" ON "AspNetUsers" ("NormalizedEmail");
+
+
+CREATE UNIQUE INDEX "UserNameIndex" ON "AspNetUsers" ("NormalizedUserName");
+
+
+CREATE UNIQUE INDEX "IX_Assets_Name" ON "Assets" ("Name");
+
+
+CREATE INDEX "IX_IncidentAlerts_AlertId" ON "IncidentAlerts" ("AlertId");
+
+
+CREATE UNIQUE INDEX "IX_IncidentAlerts_IncidentId_AlertId" ON "IncidentAlerts" ("IncidentId", "AlertId");
+
+
+CREATE INDEX "IX_IncidentTimeline_IncidentId" ON "IncidentTimeline" ("IncidentId");
+
+
+CREATE UNIQUE INDEX "IX_OutboxMessages_EventId" ON "OutboxMessages" ("EventId");
+
+
+CREATE INDEX "IX_OutboxMessages_PublishedAt_NextAttemptAt" ON "OutboxMessages" ("PublishedAt", "NextAttemptAt");
+
+
+CREATE INDEX "IX_PlaybookRuns_AssetId" ON "PlaybookRuns" ("AssetId");
+
+
+CREATE INDEX "IX_PlaybookRuns_IncidentId" ON "PlaybookRuns" ("IncidentId");
+
+
+CREATE INDEX "IX_PlaybookRuns_PlaybookId" ON "PlaybookRuns" ("PlaybookId");
+
+
+CREATE UNIQUE INDEX "IX_ProcessedMessages_EventId" ON "ProcessedMessages" ("EventId");
+
+
+CREATE INDEX "IX_SecurityEvents_Device_Account_OccurredAt" ON "SecurityEvents" ("Device", "Account", "OccurredAt");
+
+
+CREATE INDEX "IX_SecurityEvents_OccurredAt" ON "SecurityEvents" ("OccurredAt");
+
+
+CREATE INDEX "IX_SecurityEvents_ScenarioRunId" ON "SecurityEvents" ("ScenarioRunId");
+
+
+CREATE UNIQUE INDEX "IX_ServiceHeartbeats_Service" ON "ServiceHeartbeats" ("Service");
+
+
+
+CREATE FUNCTION velqora_append_only() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'Audit and incident timeline are append-only'; END; $$;
+CREATE TRIGGER audit_immutable BEFORE UPDATE OR DELETE ON "AuditEvents" FOR EACH ROW EXECUTE FUNCTION velqora_append_only();
+CREATE TRIGGER timeline_immutable BEFORE UPDATE OR DELETE ON "IncidentTimeline" FOR EACH ROW EXECUTE FUNCTION velqora_append_only();

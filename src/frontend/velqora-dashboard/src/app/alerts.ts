@@ -1,0 +1,36 @@
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Alert, AlertStatus, Incident, Page, Rule, SecurityEvent, User } from './models';
+import { PageUi } from './page';
+@Component({selector:'app-alerts',imports:[CommonModule,FormsModule,RouterLink],template:`
+<div class="page-heading"><div><div class="eyebrow">DETECTION & TRIAGE</div><h1>Alerts<span class="heading-dot">.</span></h1><p>Turn suspicious signals into informed decisions.</p></div><button class="button" (click)="load()">↻ Refresh</button></div>
+@if(error()){<div class="notice error" role="alert">{{error()}}</div>}
+<section class="panel"><form class="filters" (ngSubmit)="page=1;load()"><input class="grow" aria-label="Search alerts" name="q" [(ngModel)]="q" placeholder="Search detection, device, or identity…"><select aria-label="Alert status" name="status" [(ngModel)]="status"><option value="">All statuses</option>@for(s of statuses;track s){<option>{{s}}</option>}</select><select aria-label="Alert severity" name="severity" [(ngModel)]="severity"><option value="">All severities</option>@for(s of ['Low','Medium','High','Critical'];track s){<option>{{s}}</option>}</select><button class="button">Apply filters</button></form>
+<div class="table-wrap"><table><thead><tr><th>Detection</th><th>Severity</th><th>Device / identity</th><th>Status</th><th>Detected · UTC</th><th></th></tr></thead><tbody>@for(a of data()?.items??[];track a.id){<tr><td><a class="table-title" [routerLink]="['/alerts',a.id]">{{a.title}}</a><small class="mono">{{a.id.slice(0,8)}} · RULE v{{a.ruleVersion}}</small></td><td><span [class]="'badge '+a.severity.toLowerCase()">{{a.severity}}</span></td><td>{{a.device}}<small>{{a.account}}</small></td><td>{{a.status}}</td><td class="muted">{{a.detectedAt|date:'MMM d, HH:mm':'UTC'}}</td><td><a [routerLink]="['/alerts',a.id]">Investigate ↗</a></td></tr>}@empty{<tr><td colspan="6" class="empty-cell">{{loading()?'Loading alerts…':'No alerts found. Start a scenario in the Simulation Lab.'}}</td></tr>}</tbody></table></div><div class="pagination"><span>{{data()?.total??0}} alerts</span><div><button class="button small" [disabled]="page===1" (click)="page=page-1;load()">Previous</button><span>{{page}}</span><button class="button small" [disabled]="page*25 >= (data()?.total??0)" (click)="page=page+1;load()">Next</button></div></div></section>
+`})
+export class AlertsComponent extends PageUi {
+  data=signal<Page<Alert>|null>(null);q='';status='';severity='';page=1;statuses=['New','Acknowledged','Investigating','Resolved','FalsePositive'];
+  constructor(){super();this.poll(()=>this.load(),5000);}
+  load(){return this.read(async()=>{const p=new URLSearchParams({q:this.q,page:String(this.page)});if(this.status)p.set('status',this.status);if(this.severity)p.set('severity',this.severity);this.data.set(await this.api.get<Page<Alert>>('alerts?'+p));});}
+}
+@Component({selector:'app-alert-detail',imports:[CommonModule,FormsModule,RouterLink],template:`
+<a class="back-link" routerLink="/alerts">← All alerts</a>
+@if(error()){<div class="notice error" role="alert">{{error()}}</div>}
+@if(success()){<div class="notice success">{{success()}}</div>}
+@if(data();as d){<div class="page-heading"><div><div class="eyebrow">ALERT · {{d.alert.id.slice(0,8)}}</div><h1>{{d.alert.title}}</h1><p>{{d.alert.device}} / {{d.alert.account}} · Detected {{d.alert.detectedAt|date:'medium':'UTC'}} UTC</p></div><span [class]="'badge '+d.alert.severity.toLowerCase()">{{d.alert.severity}}</span></div>
+<div class="detail-grid"><section class="panel"><div class="panel-heading"><div><h2>Correlated evidence</h2><p>{{d.evidence.length}} events · rule version {{d.alert.ruleVersion}}</p></div><span class="tag">{{d.alert.synthetic?'SYNTHETIC':'INTEGRATION'}}</span></div><div class="event-timeline">@for(e of d.evidence;track e.id){<div class="event-line"><span class="timeline-dot" [class.danger]="e.type==='auth.failure'"></span><div><strong>{{e.type}}</strong><span class="mono muted">{{e.occurredAt|date:'HH:mm:ss.SSS':'UTC'}} UTC</span><p>{{e.device}} · {{e.account}} · {{e.ipAddress}}</p></div></div>}</div><div class="detail-body border-top"><h3>Detection logic</h3><p class="muted">{{d.rule.description}}</p><div class="tag-row"><span class="tag">{{d.rule.kind}}</span><span class="tag">Threshold {{d.rule.threshold}}</span><span class="tag">{{d.rule.windowSeconds}}s window</span></div></div></section>
+<div><section class="panel"><div class="panel-heading"><h2>Triage</h2></div><form class="detail-body" (ngSubmit)="save()"><label>Status<select name="status" [(ngModel)]="status" [disabled]="!auth.canOperate">@for(s of statuses;track s){<option [value]="s">{{s}}</option>}</select></label><label>Assigned analyst<select name="owner" [(ngModel)]="owner" [disabled]="!auth.canOperate"><option value="">Unassigned</option>@for(u of operators();track u.id){<option [value]="u.id">{{u.email}}</option>}</select></label><label>Analyst feedback<textarea name="feedback" [(ngModel)]="feedback" maxlength="1000" [disabled]="!auth.canOperate" placeholder="Investigation notes or rule tuning feedback…"></textarea></label>@if(auth.canOperate){<button class="button primary full" [disabled]="busy()">Save triage</button>}</form></section>
+@if(auth.canOperate){<section class="panel spaced"><div class="panel-heading"><h2>Escalate to incident</h2></div><form class="detail-body" (ngSubmit)="createIncident()"><label>Incident title<input name="title" [(ngModel)]="title" required maxlength="200"></label><label>Initial summary<textarea name="summary" [(ngModel)]="summary" maxlength="3000"></textarea></label><button class="button full" [disabled]="busy()">Create incident →</button></form></section>}</div></div>}
+`})
+export class AlertDetailComponent extends PageUi {
+  route=inject(ActivatedRoute);router=inject(Router);
+  data=signal<{alert:Alert;evidence:SecurityEvent[];rule:Rule}|null>(null);operators=signal<User[]>([]);
+  status:AlertStatus='New';owner='';feedback='';title='';summary='';statuses=['New','Acknowledged','Investigating','Resolved','FalsePositive'];
+  constructor(){super();this.route.paramMap.pipe(takeUntilDestroyed()).subscribe(()=>void this.load());}
+  load(){return this.read(async()=>{const [d,u]=await Promise.all([this.api.get<{alert:Alert;evidence:SecurityEvent[];rule:Rule}>('alerts/'+this.route.snapshot.params['id']),this.api.get<User[]>('users')]);this.data.set(d);this.operators.set(u.filter(x=>x.roles.some(r=>r==='Admin'||r==='Analyst')));this.status=d.alert.status;this.owner=d.alert.ownerId??'';this.feedback=d.alert.feedback??'';this.title=d.alert.title;});}
+  save(){return this.act(async()=>{const a=this.data()!.alert;await this.api.put('alerts/'+a.id,{version:a.version,status:this.status,ownerId:this.owner||null,feedback:this.feedback});await this.load();this.success.set('Triage saved.');});}
+  createIncident(){return this.act(async()=>{const a=this.data()!.alert;const i=await this.api.post<Incident>('incidents',{title:this.title,summary:this.summary,severity:a.severity,alertIds:[a.id]});await this.router.navigate(['/incidents',i.id]);});}
+}

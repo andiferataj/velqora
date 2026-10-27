@@ -1,0 +1,306 @@
+{
+  "monitoring": {
+    "at": "2026-10-26T18:40:55.297Z",
+    "passed": true,
+    "metrics": [
+      "velqora_events_ingested_total",
+      "velqora_alerts_created_total",
+      "velqora_outbox_pending",
+      "velqora_queue_pending",
+      "velqora_queue_dead_letters",
+      "velqora_detection_duration_milliseconds_bucket",
+      "velqora_event_processing_delay_seconds_bucket"
+    ],
+    "traceId": "11b4d110129d5d8c2bc9ade7f0c6b8b2",
+    "services": [
+      "velqora-worker",
+      "velqora-api"
+    ]
+  },
+  "performance": {
+    "at": "2026-10-26T18:40:15.346Z",
+    "origin": "http://localhost:4200",
+    "source": "release-load-1793039981286",
+    "workload": {
+      "batches": 300,
+      "eventsPerBatch": 10,
+      "scheduledEventsPerSecond": 100,
+      "durationSeconds": 30
+    },
+    "actual": {
+      "acceptedEvents": 3000,
+      "storedEvents": 3000,
+      "requestMilliseconds": {
+        "p50": 13.53,
+        "p95": 20.47,
+        "max": 36.15740000000005
+      },
+      "ingestionSeconds": 29.916627100000003,
+      "drainSeconds": 4.142975199999997,
+      "drained": true,
+      "failures": []
+    },
+    "host": {
+      "platform": "win32",
+      "cpuCount": 12,
+      "memoryGiB": 16
+    },
+    "passed": true
+  },
+  "scope": "Local Velqora SOC release acceptance",
+  "images": [
+    {
+      "ID": "sha256:e39311df1f3d941923c00da79ac7ba6269124a870ee87e3c3ad24d60f8aee4d2",
+      "ContainerName": "velqora-otel-1",
+      "Repository": "otel/opentelemetry-collector-contrib",
+      "Tag": "0.123.0",
+      "Platform": "linux/amd64",
+      "Size": 416670413,
+      "Created": "2025-04-01T14:03:32.917713435Z",
+      "LastTagTime": "2026-10-26T18:34:21.101972109Z"
+    },
+    {
+      "ID": "sha256:62d2b9d20a19714ebfe48d1bb405086081bc602aa053e28cf6d73c7537640dfb",
+      "ContainerName": "velqora-grafana-1",
+      "Repository": "grafana/grafana",
+      "Tag": "11.6.0",
+      "Platform": "linux/amd64",
+      "Size": 873210070,
+      "Created": "2025-03-21T14:06:22.583444934Z",
+      "LastTagTime": "2026-10-26T18:34:29.678280847Z"
+    },
+    {
+      "ID": "sha256:8e3cd3910546544202830f9e7fde4c3e5797e2268273c98473281fdb9b215a7a",
+      "ContainerName": "velqora-worker-1",
+      "Repository": "velqora-worker",
+      "Tag": "latest",
+      "Platform": "linux/amd64",
+      "Size": 375991495,
+      "Created": "2026-10-26T18:34:59.517590896Z",
+      "LastTagTime": "2026-10-26T18:35:00.375817207Z"
+    },
+    {
+      "ID": "sha256:6927e0919a144aa7616fd0137d4816816d42f6b816de3af269ab065250859a62",
+      "ContainerName": "velqora-prometheus-1",
+      "Repository": "prom/prometheus",
+      "Tag": "v3.2.1",
+      "Platform": "linux/amd64",
+      "Size": 414927369,
+      "Created": "2025-02-26T09:46:12.292017399Z",
+      "LastTagTime": "2026-10-26T18:34:29.366283353Z"
+    },
+    {
+      "ID": "sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94",
+      "ContainerName": "velqora-postgres-1",
+      "Repository": "postgres",
+      "Tag": "17.6-alpine",
+      "Platform": "linux/amd64",
+      "Size": 397621977,
+      "Created": "2025-10-15T18:23:03Z",
+      "LastTagTime": "2026-10-26T15:10:56.427774958Z"
+    },
+    {
+      "ID": "sha256:5cbd7145b0306399ad68422c3350b6cbd1bb95704b39f5896480e5b6d4238a04",
+      "ContainerName": "velqora-rabbitmq-1",
+      "Repository": "rabbitmq",
+      "Tag": "4.1.4-management-alpine",
+      "Platform": "linux/amd64",
+      "Size": 305272919,
+      "Created": "2025-04-15T17:26:54Z",
+      "LastTagTime": "2026-10-26T15:10:50.870966703Z"
+    },
+    {
+      "ID": "sha256:c430eed838da539faca641bbfbd755a58aa3e454ec00c5a5b7d09874ef7ff01e",
+      "ContainerName": "velqora-api-1",
+      "Repository": "velqora-api",
+      "Tag": "latest",
+      "Platform": "linux/amd64",
+      "Size": 376343788,
+      "Created": "2026-10-26T18:35:01.640168302Z",
+      "LastTagTime": "2026-10-26T18:35:02.389007288Z"
+    },
+    {
+      "ID": "sha256:6279882637ae03e70f519965d2ba5ca84cb785f4baf4f0d7237e827a37c33a42",
+      "ContainerName": "velqora-jaeger-1",
+      "Repository": "jaegertracing/all-in-one",
+      "Tag": "1.68.0",
+      "Platform": "linux/amd64",
+      "Size": 119043227,
+      "Created": "2025-04-05T11:15:32.538540222Z",
+      "LastTagTime": "2026-10-26T18:34:22.48705863Z"
+    },
+    {
+      "ID": "sha256:392a2638773a04e85b851a53de4fd3eed73b9d92b760b98bd6a3677f9a8e3e45",
+      "ContainerName": "velqora-dashboard-1",
+      "Repository": "velqora-dashboard",
+      "Tag": "latest",
+      "Platform": "linux/amd64",
+      "Size": 82220964,
+      "Created": "2026-10-26T18:34:55.365827968Z",
+      "LastTagTime": "2026-10-26T18:34:55.895635149Z"
+    },
+    {
+      "ID": "sha256:3b73847e72874be07e6657b129a94761662b79bc0f679273757d4218573b2a98",
+      "ContainerName": "velqora-redis-1",
+      "Repository": "redis",
+      "Tag": "7.4.6-alpine",
+      "Platform": "linux/amd64",
+      "Size": 60660427,
+      "Created": "2025-10-03T11:58:08Z",
+      "LastTagTime": "2026-10-26T15:10:52.108205652Z"
+    }
+  ],
+  "resourceSnapshot": [
+    {
+      "BlockIO": "0B / 4.1kB",
+      "CPUPerc": "0.00%",
+      "Container": "538234cee72e523481250e6680f7173c926fcd53fe9a2508b52a045721be73ad",
+      "ID": "538234cee72e",
+      "MemPerc": "0.13%",
+      "MemUsage": "10.45MiB / 7.675GiB",
+      "Name": "velqora-dashboard-1",
+      "NetIO": "3.88MB / 7.04MB",
+      "PIDs": "13"
+    },
+    {
+      "BlockIO": "0B / 0B",
+      "CPUPerc": "8.86%",
+      "Container": "8306f155082d81259f067e8800401d18f5d233dd5f7e3e0db808eec0d069fc07",
+      "ID": "8306f155082d",
+      "MemPerc": "1.43%",
+      "MemUsage": "112.4MiB / 7.675GiB",
+      "Name": "velqora-worker-1",
+      "NetIO": "830kB / 734kB",
+      "PIDs": "44"
+    },
+    {
+      "BlockIO": "0B / 0B",
+      "CPUPerc": "0.26%",
+      "Container": "0adf1e56194f268e1996669d3d320ac83cdee4f06a56bcf521bfe6a2833dd0d5",
+      "ID": "0adf1e56194f",
+      "MemPerc": "0.68%",
+      "MemUsage": "53.27MiB / 7.675GiB",
+      "Name": "velqora-otel-1",
+      "NetIO": "2.13MB / 907kB",
+      "PIDs": "16"
+    },
+    {
+      "BlockIO": "0B / 0B",
+      "CPUPerc": "1.15%",
+      "Container": "2d5abb1c36111893ff65ddb01f85d2a0ced718cc8a957f953a7b5caa790d4b49",
+      "ID": "2d5abb1c3611",
+      "MemPerc": "3.11%",
+      "MemUsage": "244.5MiB / 7.675GiB",
+      "Name": "velqora-api-1",
+      "NetIO": "4.43MB / 6.89MB",
+      "PIDs": "44"
+    },
+    {
+      "BlockIO": "0B / 0B",
+      "CPUPerc": "0.02%",
+      "Container": "4839e4627b886752d98cedac4773a33600e7c2103172928f15f0ef7628cbc2e2",
+      "ID": "4839e4627b88",
+      "MemPerc": "0.71%",
+      "MemUsage": "56.03MiB / 7.675GiB",
+      "Name": "velqora-jaeger-1",
+      "NetIO": "721kB / 1.04MB",
+      "PIDs": "17"
+    },
+    {
+      "BlockIO": "0B / 180kB",
+      "CPUPerc": "0.00%",
+      "Container": "6dda41258f3812fbd07dba096a27346e9f3ac9ede87656f877511f7ee57bb427",
+      "ID": "6dda41258f38",
+      "MemPerc": "0.32%",
+      "MemUsage": "25.29MiB / 7.675GiB",
+      "Name": "velqora-prometheus-1",
+      "NetIO": "135kB / 22.6kB",
+      "PIDs": "17"
+    },
+    {
+      "BlockIO": "0B / 70.2MB",
+      "CPUPerc": "0.34%",
+      "Container": "e81378fe161bcd650e7b8bbf8edc2b534a62291d640d42e5cfd02832ad6682d5",
+      "ID": "e81378fe161b",
+      "MemPerc": "0.94%",
+      "MemUsage": "73.57MiB / 7.675GiB",
+      "Name": "velqora-grafana-1",
+      "NetIO": "15.3MB / 365kB",
+      "PIDs": "18"
+    },
+    {
+      "BlockIO": "3.54MB / 778MB",
+      "CPUPerc": "3.10%",
+      "Container": "622a2542352c39eaacf08151706065ac85c6245b370fe0c696592fd9af33a1df",
+      "ID": "622a2542352c",
+      "MemPerc": "1.11%",
+      "MemUsage": "87.42MiB / 7.675GiB",
+      "Name": "velqora-postgres-1",
+      "NetIO": "284MB / 327MB",
+      "PIDs": "11"
+    },
+    {
+      "BlockIO": "614kB / 369kB",
+      "CPUPerc": "1.62%",
+      "Container": "20c42d17d4feff7771987ae5a6abf22dba29f072fc4c221f50a98da433a8d8a4",
+      "ID": "20c42d17d4fe",
+      "MemPerc": "1.17%",
+      "MemUsage": "92.19MiB / 7.675GiB",
+      "Name": "velqora-rabbitmq-1",
+      "NetIO": "34.4kB / 27.8kB",
+      "PIDs": "46"
+    },
+    {
+      "BlockIO": "1.46MB / 0B",
+      "CPUPerc": "1.00%",
+      "Container": "f4252317a4a98df0cfb8a658006e557909e957a32e85954963ccaf62cb19c10c",
+      "ID": "f4252317a4a9",
+      "MemPerc": "0.04%",
+      "MemUsage": "3.418MiB / 7.675GiB",
+      "Name": "velqora-redis-1",
+      "NetIO": "5.08kB / 5.19kB",
+      "PIDs": "6"
+    }
+  ],
+  "release": {
+    "passed": true,
+    "gates": [
+      {
+        "gate": "Docker access and monitored production stack",
+        "passed": true,
+        "seconds": 86.62690409999999
+      },
+      {
+        "gate": "Builds, unit/model, isolated integration, production CSP and browser workflows",
+        "passed": true,
+        "seconds": 242.14951829999998
+      },
+      {
+        "gate": "Dependency audit",
+        "passed": true,
+        "seconds": 5.6848442
+      },
+      {
+        "gate": "100 events/sec ingestion and durable drain",
+        "passed": true,
+        "seconds": 34.8346151
+      },
+      {
+        "gate": "Broker/cache outage and worker restart recovery",
+        "passed": true,
+        "seconds": 34.1731565
+      },
+      {
+        "gate": "Backup restore into a disposable database",
+        "passed": true,
+        "seconds": 5.3389058
+      },
+      {
+        "gate": "Exported metrics, monitoring health and distributed trace continuation",
+        "passed": true,
+        "seconds": 0.42435249999999997
+      }
+    ],
+    "at": "2026-10-26T19:40:55.3232438+01:00"
+  }
+}

@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+.env
+*.user
+*.log
+.local/
+test-results/
+playwright-report/
+coverage/
+artifacts/
+**/.keys/
+**/out-tsc/
+**/.angular/

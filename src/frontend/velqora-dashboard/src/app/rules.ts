@@ -1,0 +1,20 @@
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { A11yModule } from '@angular/cdk/a11y';
+import { Rule } from './models';
+import { PageUi } from './page';
+@Component({selector:'app-rules',imports:[CommonModule,FormsModule,A11yModule],template:`
+<div class="page-heading"><div><div class="eyebrow">DETECTION ENGINE</div><h1>Detection rules<span class="heading-dot">.</span></h1><p>Explainable logic. Versioned changes. Less noise.</p></div>@if(auth.isAdmin){<button class="button primary" (click)="create()">+ Create rule</button>}</div>
+@if(error()){<div class="notice error" role="alert">{{error()}}</div>}@if(success()){<div class="notice success">{{success()}}</div>}
+<div class="card-grid">@for(r of rules();track r.id){<section class="panel rule-card"><div class="card-top"><span class="rule-symbol">⌘</span><span class="status" [class.offline]="!r.enabled"><i></i>{{r.enabled?'Enabled':'Disabled'}}</span></div><h2>{{r.name}}</h2><p>{{r.description}}</p><div class="tag-row"><span [class]="'badge '+r.severity.toLowerCase()">{{r.severity}}</span><span class="tag">{{r.kind}}</span></div><div class="rule-details"><div><small>THRESHOLD</small><strong>{{r.threshold}} events</strong></div><div><small>WINDOW</small><strong>{{r.windowSeconds}} seconds</strong></div><div><small>VERSION</small><strong>v{{r.version}}</strong></div></div><div class="card-footer"><span class="mono muted">{{r.eventType}}</span>@if(auth.isAdmin){<button class="link-button" (click)="edit(r)">Configure ↗</button>}</div></section>}@empty{<div class="empty">No detection rules available.</div>}</div>
+@if(draft();as r){<div class="modal-backdrop"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="rule-title" cdkTrapFocus [cdkTrapFocusAutoCapture]="true" (keydown.escape)="draft.set(null)"><div class="panel-heading"><h2 id="rule-title">{{r.id?'Configure rule':'Create detection rule'}}</h2><button class="icon-button" aria-label="Close" (click)="draft.set(null)">×</button></div><form class="detail-body" (ngSubmit)="save()"><label>Name<input name="name" [(ngModel)]="r.name" required maxlength="120"></label><label>Description<textarea name="description" [(ngModel)]="r.description" maxlength="1000"></textarea></label><div class="form-grid"><label>Rule kind<select name="kind" [(ngModel)]="r.kind">@for(k of kinds;track k){<option>{{k}}</option>}</select></label><label>Event type<input name="eventType" [(ngModel)]="r.eventType" required maxlength="80"></label><label>Threshold<input name="threshold" type="number" min="1" max="10000" [(ngModel)]="r.threshold" required></label><label>Window · seconds<input name="window" type="number" min="10" max="86400" [(ngModel)]="r.windowSeconds" required></label><label>Severity<select name="severity" [(ngModel)]="r.severity">@for(s of ['Low','Medium','High','Critical'];track s){<option>{{s}}</option>}</select></label><label class="checkbox-label"><input type="checkbox" name="enabled" [(ngModel)]="r.enabled"> Enabled</label></div><p class="muted">Changes apply to future evaluations and increment the rule version. Historical alerts retain their detection version.</p><button class="button primary full" [disabled]="busy()">Save rule</button></form></section></div>}
+`})
+export class RulesComponent extends PageUi {
+  rules=signal<Rule[]>([]);draft=signal<Rule|null>(null);kinds=['Threshold','FailureThenSuccess','PrivilegeMisuse','TelemetryLoss'];
+  constructor(){super();void this.load();}
+  load(){return this.read(async()=>this.rules.set(await this.api.get<Rule[]>('rules')));}
+  create(){this.draft.set({id:'',version:1,createdAt:'',name:'',description:'',kind:'Threshold',eventType:'auth.failure',threshold:10,windowSeconds:300,severity:'High',enabled:true});}
+  edit(r:Rule){this.draft.set({...r});}
+  save(){return this.act(async()=>{const r=this.draft()!;if(r.id)await this.api.put('rules/'+r.id,r);else await this.api.post('rules',r);this.draft.set(null);await this.load();this.success.set('Rule saved.');});}
+}

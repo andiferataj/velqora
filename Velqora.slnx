@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/backend/Velqora.Core/Velqora.Core.csproj" />
+    <Project Path="src/backend/Velqora.Infrastructure/Velqora.Infrastructure.csproj" />
+    <Project Path="src/backend/Velqora.Api/Velqora.Api.csproj" />
+    <Project Path="src/backend/Velqora.Worker/Velqora.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Velqora.UnitTests/Velqora.UnitTests.csproj" /><Project Path="tests/Velqora.IntegrationTests/Velqora.IntegrationTests.csproj" />
+    <Project Path="tests/Velqora.CoreChecks/Velqora.CoreChecks.csproj" />
+  </Folder>
+</Solution>

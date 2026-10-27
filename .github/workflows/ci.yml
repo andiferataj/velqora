@@ -1,0 +1,79 @@
+name: Verify Velqora
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: {dotnet-version: "10.0.300"}
+      - run: dotnet restore Velqora.slnx --locked-mode
+      - run: dotnet build Velqora.slnx -c Release --no-restore
+      - run: dotnet test tests/Velqora.UnitTests -c Release --no-build
+      - run: dotnet test tests/Velqora.IntegrationTests -c Release --no-build
+      - run: dotnet run --project tools/ModelChecks -- .
+      - run: dotnet list Velqora.slnx package --vulnerable --include-transitive
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: "24.15.0"}
+      - name: Generate ephemeral CI credentials
+        shell: pwsh
+        run: ./infrastructure/scripts/bootstrap.ps1
+      - run: docker compose --profile monitoring up --build -d --wait --wait-timeout 300
+      - name: Build Angular and run Playwright against the Compose stack
+        shell: pwsh
+        run: |
+          foreach($line in Get-Content '.env') {
+            if($line -match '^DEMO_PASSWORD=(.+)$'){$env:VELQORA_DEMO_PASSWORD=$Matches[1]}
+            if($line -match '^INGESTION_API_KEY=(.+)$'){$env:VELQORA_INGESTION_KEY=$Matches[1]}
+          }
+          npm ci --no-audit --no-fund
+          if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+          npm audit --audit-level=high
+          if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+          npm --prefix src/frontend/velqora-dashboard run build -- --output-path ../../../.local/dashboard-build
+          if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+          npx playwright install --with-deps chromium
+          if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+          node tools/smoke-dashboard.cjs
+          if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+          npm run test:e2e
+          exit $LASTEXITCODE
+      - name: Failure recovery acceptance
+        shell: pwsh
+        run: ./infrastructure/scripts/resilience.ps1
+      - name: Load acceptance
+        shell: pwsh
+        run: |
+          foreach($line in Get-Content '.env') {
+            if($line -match '^DEMO_PASSWORD=(.+)$'){$env:VELQORA_DEMO_PASSWORD=$Matches[1]}
+            if($line -match '^INGESTION_API_KEY=(.+)$'){$env:VELQORA_INGESTION_KEY=$Matches[1]}
+          }
+          node tools/benchmark.cjs
+          exit $LASTEXITCODE
+      - name: Disposable backup restore rehearsal
+        shell: pwsh
+        run: ./infrastructure/scripts/backup-rehearsal.ps1
+      - name: Metrics and distributed traces
+        run: node tools/check-monitoring.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-evidence
+          include-hidden-files: true
+          path: |
+            .local/release/
+            src/frontend/velqora-dashboard/playwright-report/
+            src/frontend/velqora-dashboard/test-results/
+      - if: failure()
+        run: docker compose logs --tail 150
+      - if: always()
+        run: docker compose down -v

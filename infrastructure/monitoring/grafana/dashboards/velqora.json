@@ -1,0 +1,150 @@
+{
+  "uid": "velqora",
+  "title": "Velqora / Security pipeline",
+  "schemaVersion": 40,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Ingestion / sec",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(velqora_events_ingested_total[1m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Alert creation / sec",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(velqora_alerts_created_total[1m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Detection latency p95 (ms)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(velqora_detection_duration_milliseconds_bucket[5m])))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Processing failures / sec",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(velqora_processing_failures_total[1m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Queue and outbox backlog",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "type": "timeseries",
+      "id": 5,
+      "gridPos": {
+        "y": 16,
+        "w": 12,
+        "x": 0,
+        "h": 8
+      },
+      "targets": [
+        {
+          "legendFormat": "Detection queue",
+          "refId": "A",
+          "expr": "velqora_queue_pending"
+        },
+        {
+          "legendFormat": "Outbox",
+          "refId": "B",
+          "expr": "velqora_outbox_pending"
+        },
+        {
+          "legendFormat": "Dead letters",
+          "refId": "C",
+          "expr": "velqora_queue_dead_letters"
+        }
+      ]
+    },
+    {
+      "title": "Event processing delay p95 (seconds)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "type": "timeseries",
+      "id": 6,
+      "gridPos": {
+        "y": 16,
+        "w": 12,
+        "x": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(velqora_event_processing_delay_seconds_bucket[5m])))"
+        }
+      ]
+    }
+  ]
+}

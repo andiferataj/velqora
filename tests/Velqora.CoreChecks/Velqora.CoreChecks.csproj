@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType></PropertyGroup><ItemGroup>
+<ProjectReference Include="../../src/backend/Velqora.Core/Velqora.Core.csproj" />
+<Compile Include="../Specifications.cs" Link="Specifications.cs" />
+</ItemGroup></Project>
